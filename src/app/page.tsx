@@ -107,7 +107,7 @@ export default function Home() {
       <footer className="mt-20 border-t border-slate-200 bg-white py-12">
         <div className="container mx-auto px-4 text-center sm:px-6 lg:px-8">
           <p className="text-sm text-muted">
-            © 2026 Morning Brew. All rights reserved. Built for your daily catchup.
+            © 2026 Morning Scroll. All rights reserved. Built for your daily catchup.
           </p>
         </div>
       </footer>

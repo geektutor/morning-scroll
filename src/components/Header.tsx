@@ -23,7 +23,7 @@ export const Header = ({ onMenuClick, onSavedFeedClick }: HeaderProps) => {
                         <Coffee size={24} />
                     </div>
                     <span className="text-xl font-bold tracking-tight text-primary">
-                        Morning <span className="text-accent">Brew</span>
+                        Morning <span className="text-accent">Scroll</span>
                     </span>
                 </div>
 

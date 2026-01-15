@@ -54,7 +54,7 @@ export const Sidebar = ({ selectedCategory, onCategoryChange, isOpen, onClose }:
             )}>
                 <div className="flex items-center justify-between lg:hidden">
                     <span className="text-xl font-bold tracking-tight text-primary">
-                        Morning <span className="text-accent">Brew</span>
+                        Morning <span className="text-accent">Scroll</span>
                     </span>
                     <button
                         onClick={onClose}
