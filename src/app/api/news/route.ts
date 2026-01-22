@@ -15,15 +15,19 @@ const parser = new Parser({
 
 const FEED_CONFIG = {
     "Nigeria": [
+        "https://businessday.ng/feed/",
         "https://www.vanguardngr.com/feed/",
+        "https://nairametrics.com/feed/",
         "https://punchng.com/feed/",
         "https://www.premiumtimesng.com/feed",
-        "https://guardian.ng/feed/"
+        "https://guardian.ng/feed/",
     ],
     "Technology": [
         "https://hnrss.org/frontpage",
         "https://www.theverge.com/rss/index.xml",
-        "https://techcrunch.com/feed/"
+        "https://techcrunch.com/feed/",
+        "https://techpoint.africa/feed/",
+
     ],
     "World News": [
         "http://feeds.bbci.co.uk/news/world/rss.xml",
@@ -52,7 +56,13 @@ const FEED_CONFIG = {
         "https://www.nytimes.com/svc/vendor/nythelp/rss/resources/opinion.xml",
         "https://www.theguardian.com/commentisfree/rss",
         "https://www.aljazeera.com/xml/rss/all.xml"
-    ]
+    ],
+    "Sports": [
+        "https://www.bbc.com/sport/football/rss",
+        "https://www.espn.com/espn/rss/news",
+        "https://www.skysports.com/rss/football",
+        "https://www.completesports.com/feed/",
+    ],
 };
 
 export async function GET(request: Request) {

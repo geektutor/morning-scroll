@@ -5,6 +5,7 @@ import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { HeroArticle } from '@/components/HeroArticle';
 import { ArticleCard } from '@/components/ArticleCard';
+import { Onboarding } from '@/components/Onboarding';
 
 import { useBookmarks } from '@/context/BookmarkContext';
 
@@ -14,7 +15,18 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userCategories, setUserCategories] = useState<string[]>([]);
   const { bookmarks } = useBookmarks();
+
+  useEffect(() => {
+    // Load persisted user categories
+    const saved = localStorage.getItem('userCategories');
+    if (saved) {
+      setUserCategories(JSON.parse(saved));
+      // Default to My Feed if user has onboarded
+      setActiveCategory('My Feed');
+    }
+  }, []);
 
   useEffect(() => {
     if (activeCategory === 'Saved Articles') {
@@ -33,14 +45,10 @@ export default function Home() {
         }
 
         if (activeCategory === 'My Feed') {
-          const bookmarkedCategories = Array.from(new Set(bookmarks.map(b => b.category)));
-          if (bookmarkedCategories.length > 0) {
-            url = `/api/news?categories=${encodeURIComponent(bookmarkedCategories.join(','))}`;
-            if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
-          } else {
-            url = `/api/news?category=Top Stories`;
-            if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
-          }
+          // Use userCategories if in 'My Feed'
+          const feedCategories = userCategories.length > 0 ? userCategories : ['Top Stories'];
+          url = `/api/news?categories=${encodeURIComponent(feedCategories.join(','))}`;
+          if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
         }
 
         const res = await fetch(url);
@@ -54,7 +62,7 @@ export default function Home() {
     };
 
     fetchNews();
-  }, [activeCategory, bookmarks, searchQuery]);
+  }, [activeCategory, bookmarks, searchQuery, userCategories]);
 
   // Update articles list when bookmarks change, but only if we are in 'Saved Articles' view
   useEffect(() => {
@@ -68,6 +76,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Onboarding onComplete={(categories) => {
+        setUserCategories(categories);
+        setActiveCategory('My Feed');
+      }} />
+
       <Header
         onMenuClick={() => setIsSidebarOpen(true)}
         onSavedFeedClick={() => setActiveCategory('Saved Articles')}
@@ -79,6 +92,7 @@ export default function Home() {
           <Sidebar
             selectedCategory={activeCategory}
             onCategoryChange={setActiveCategory}
+            userCategories={userCategories}
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
           />
