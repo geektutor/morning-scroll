@@ -20,10 +20,8 @@ const FEED_CONFIG = {
         "https://nairametrics.com/feed/",
         "https://punchng.com/feed/",
         "https://www.premiumtimesng.com/feed",
-        "https://guardian.ng/feed/",
     ],
     "Technology": [
-        "https://hnrss.org/frontpage",
         "https://www.theverge.com/rss/index.xml",
         "https://techcrunch.com/feed/",
         "https://techpoint.africa/feed/",

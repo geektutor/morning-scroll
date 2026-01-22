@@ -29,7 +29,7 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/40 to-transparent" />
             </div>
 
-            <div className="relative z-10 flex flex-col justify-end p-8 md:p-12 lg:min-h-[400px]">
+            <div className="relative z-10 flex flex-col justify-end p-6 sm:p-8 md:p-12 lg:min-h-[400px]">
                 <div className="flex items-center justify-between mb-4">
                     <div className="inline-flex rounded-full bg-accent/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-accent backdrop-blur-md">
                         Featured Story
@@ -37,14 +37,14 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
                     <button
                         onClick={() => toggleBookmark(article as any)}
                         className={`rounded-full p-2 transition-all ${bookmarked
-                                ? 'bg-accent text-primary'
-                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ? 'bg-accent text-primary'
+                            : 'bg-white/10 text-white hover:bg-white/20'
                             }`}
                     >
                         <Bookmark size={20} fill={bookmarked ? "currentColor" : "none"} />
                     </button>
                 </div>
-                <h1 className="mb-4 max-w-3xl text-3xl font-bold leading-tight md:text-4xl lg:text-5xl">
+                <h1 className="mb-4 max-w-3xl text-2xl font-bold leading-tight sm:text-3xl md:text-4xl lg:text-5xl">
                     {article.title}
                 </h1>
                 <p className="mb-8 max-w-2xl text-lg text-slate-300">

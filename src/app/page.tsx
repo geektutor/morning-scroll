@@ -5,7 +5,8 @@ import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { HeroArticle } from '@/components/HeroArticle';
 import { ArticleCard } from '@/components/ArticleCard';
-import { Onboarding } from '@/components/Onboarding';
+import { PreferencesModal } from '@/components/Onboarding';
+import { AddToHomescreen } from '@/components/AddToHomescreen';
 
 import { useBookmarks } from '@/context/BookmarkContext';
 
@@ -16,15 +17,30 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userCategories, setUserCategories] = useState<string[]>([]);
+
+  const [viewPreference, setViewPreference] = useState<'grid' | 'list'>('grid');
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+
   const { bookmarks } = useBookmarks();
 
   useEffect(() => {
-    // Load persisted user categories
-    const saved = localStorage.getItem('userCategories');
-    if (saved) {
-      setUserCategories(JSON.parse(saved));
-      // Default to My Feed if user has onboarded
+    // Load persisted user categories and view preference
+    const savedCategories = localStorage.getItem('userCategories');
+    const savedViewPreference = localStorage.getItem('viewPreference') as 'grid' | 'list';
+    const hasOnboarded = localStorage.getItem('onboarded');
+
+    if (savedCategories) {
+      setUserCategories(JSON.parse(savedCategories));
       setActiveCategory('My Feed');
+    }
+
+    if (savedViewPreference) {
+      setViewPreference(savedViewPreference);
+    }
+
+    if (!hasOnboarded) {
+      setIsPreferencesOpen(true);
     }
   }, []);
 
@@ -76,10 +92,31 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Onboarding onComplete={(categories) => {
-        setUserCategories(categories);
-        setActiveCategory('My Feed');
-      }} />
+      <PreferencesModal
+        isOpen={isPreferencesOpen}
+        onClose={() => setIsPreferencesOpen(false)}
+        initialCategories={userCategories}
+        initialViewPreference={viewPreference}
+        onComplete={(categories, view) => {
+          // Check if this was the first onboarding to show install prompt
+          // We can check if userCategories was empty before update, or just check localStorage before this update (but it's async/React state). 
+          // Simplest: If we are in this callback, and we just set 'onboarded' (which modal does), we can assume it's a good time to prompt if not already installed.
+          // But to differentiate "Settings Update" vs "First Onboarding", we can check if 'userCategories' (state) was empty.
+          if (userCategories.length === 0) {
+            setShowInstallPrompt(true);
+          }
+
+          setUserCategories(categories);
+          setViewPreference(view);
+          setActiveCategory('My Feed');
+          setIsPreferencesOpen(false);
+        }}
+      />
+
+      <AddToHomescreen
+        isOpen={showInstallPrompt}
+        onClose={() => setShowInstallPrompt(false)}
+      />
 
       <Header
         onMenuClick={() => setIsSidebarOpen(true)}
@@ -95,6 +132,7 @@ export default function Home() {
             userCategories={userCategories}
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
+            onSettingsClick={() => setIsPreferencesOpen(true)}
           />
 
           <div className="flex-1">
@@ -109,14 +147,22 @@ export default function Home() {
                 <section>
                   <div className="mb-8 flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-primary">Latest Stories</h2>
-                    <button className="text-sm font-semibold text-muted hover:text-primary">
-                      View All
-                    </button>
+                    <div className="flex gap-2">
+                      {/* Optional: Add visible toggles for view preference here if desired later */}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                  <div className={
+                    viewPreference === 'grid'
+                      ? "grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+                      : "flex flex-col gap-6"
+                  }>
                     {gridArticles.map((article, index) => (
-                      <ArticleCard key={article.url || index} article={article} />
+                      <ArticleCard
+                        key={article.url || index}
+                        article={article}
+                        viewMode={viewPreference}
+                      />
                     ))}
                   </div>
                 </section>

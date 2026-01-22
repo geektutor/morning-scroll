@@ -2,8 +2,9 @@ import React from 'react';
 import {
     Bookmark,
     Rss,
-    Check
+    Check,
 } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ALL_CATEGORIES } from '@/lib/categories';
 
@@ -18,6 +19,7 @@ interface SidebarProps {
     userCategories: string[];
     isOpen?: boolean;
     onClose?: () => void;
+    onSettingsClick?: () => void;
 }
 
 export const Sidebar = ({
@@ -25,7 +27,8 @@ export const Sidebar = ({
     onCategoryChange,
     userCategories,
     isOpen,
-    onClose
+    onClose,
+    onSettingsClick
 }: SidebarProps) => {
     const personalCategories = ALL_CATEGORIES.filter(cat => userCategories.includes(cat.name));
     const discoverCategories = ALL_CATEGORIES.filter(cat => !userCategories.includes(cat.name));
@@ -59,13 +62,13 @@ export const Sidebar = ({
             {/* Mobile Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm lg:hidden"
+                    className="fixed inset-0 z-[100] bg-slate-900/50 backdrop-blur-sm lg:hidden"
                     onClick={onClose}
                 />
             )}
 
             <aside className={cn(
-                "fixed inset-y-0 left-0 z-50 flex w-64 flex-col gap-8 bg-white px-4 py-8 transition-transform duration-300 lg:sticky lg:top-24 lg:z-0 lg:flex lg:h-[calc(100vh-6rem)] lg:translate-x-0 lg:bg-transparent lg:px-0 lg:py-0 overflow-y-auto no-scrollbar",
+                "fixed inset-y-0 left-0 z-[100] flex w-64 flex-col gap-8 bg-white px-4 py-8 transition-transform duration-300 lg:sticky lg:top-24 lg:z-0 lg:flex lg:h-[calc(100vh-6rem)] lg:translate-x-0 lg:bg-transparent lg:px-0 lg:py-0 overflow-y-auto no-scrollbar",
                 isOpen ? "translate-x-0" : "-translate-x-full"
             )}>
                 <div className="flex items-center justify-between lg:hidden">
@@ -86,6 +89,19 @@ export const Sidebar = ({
                             Personal
                         </h3>
                         {renderNavItems([...fixedItems, ...personalCategories] as any)}
+
+                        <div className="mt-4 pt-4 border-t border-slate-100">
+                            <button
+                                onClick={() => {
+                                    onSettingsClick?.();
+                                    onClose?.();
+                                }}
+                                className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100"
+                            >
+                                <Settings size={18} />
+                                Settings
+                            </button>
+                        </div>
                     </div>
 
                     {discoverCategories.length > 0 && (

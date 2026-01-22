@@ -15,7 +15,7 @@ interface ArticleCardProps {
 
 import { useBookmarks } from '@/context/BookmarkContext';
 
-export const ArticleCard = ({ article }: ArticleCardProps) => {
+export const ArticleCard = ({ article, viewMode = 'grid' }: ArticleCardProps & { viewMode?: 'grid' | 'list' }) => {
     const { toggleBookmark, isBookmarked } = useBookmarks();
     const [copied, setCopied] = useState(false);
     const bookmarked = isBookmarked(article.url);
@@ -31,11 +31,13 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
         e.preventDefault();
         e.stopPropagation();
 
+        const shareBranding = " - via Morning Scroll: morningscroll.xyz";
+
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: article.title,
-                    text: article.description,
+                    text: `${article.description}\n\nRead more on Morning Scroll: morningscroll.xyz`,
                     url: article.url,
                 });
             } catch (error) {
@@ -43,7 +45,7 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
             }
         } else {
             try {
-                await navigator.clipboard.writeText(article.url);
+                await navigator.clipboard.writeText(`${article.url}${shareBranding}`);
                 setCopied(true);
             } catch (error) {
                 console.error('Error copying to clipboard:', error);
@@ -56,6 +58,58 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
         day: 'numeric',
         year: 'numeric',
     });
+
+    if (viewMode === 'list') {
+        return (
+            <article className="group flex flex-col sm:flex-row overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md h-full sm:h-48">
+                <a href={article.url} target="_blank" rel="noopener noreferrer" className="relative w-full sm:w-1/3 shrink-0 overflow-hidden">
+                    <img
+                        src={article.image}
+                        alt={article.title}
+                        className="h-48 w-full sm:h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute left-4 top-4 rounded-lg bg-primary/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                        {article.category}
+                    </div>
+                </a>
+
+                <div className="flex flex-1 flex-col p-4 sm:p-5">
+                    <a href={article.url} target="_blank" rel="noopener noreferrer">
+                        <h3 className="mb-2 text-lg font-bold leading-snug text-primary group-hover:text-primary/80 line-clamp-2">
+                            {article.title}
+                        </h3>
+                    </a>
+                    <p className="mb-4 line-clamp-2 text-sm text-muted">
+                        {article.description}
+                    </p>
+
+                    <div className="mt-auto flex items-center justify-between pt-2">
+                        <span className="text-xs font-medium text-muted">{date}</span>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => toggleBookmark(article as any)}
+                                className={`rounded-full p-1.5 transition-colors ${bookmarked
+                                    ? 'bg-primary text-white'
+                                    : 'text-muted hover:bg-slate-100 hover:text-primary'
+                                    }`}
+                            >
+                                <Bookmark size={16} fill={bookmarked ? "currentColor" : "none"} />
+                            </button>
+                            <button
+                                onClick={handleShare}
+                                className={cn(
+                                    "relative rounded-full p-1.5 transition-all",
+                                    copied ? "bg-green-500 text-white" : "text-muted hover:bg-slate-100 hover:text-primary"
+                                )}
+                            >
+                                {copied ? <Check size={16} /> : <Share2 size={16} />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        );
+    }
 
     return (
         <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md">
@@ -70,7 +124,7 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
                 </div>
             </a>
 
-            <div className="flex flex-1 flex-col p-5">
+            <div className="flex flex-1 flex-col p-4 sm:p-5">
                 <a href={article.url} target="_blank" rel="noopener noreferrer">
                     <h3 className="mb-2 text-lg font-bold leading-snug text-primary group-hover:text-primary/80">
                         {article.title}
