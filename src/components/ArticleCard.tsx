@@ -61,30 +61,30 @@ export const ArticleCard = ({ article, viewMode = 'grid' }: ArticleCardProps & {
 
     if (viewMode === 'list') {
         return (
-            <article className="group flex flex-col sm:flex-row overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md h-full sm:h-48">
-                <a href={article.url} target="_blank" rel="noopener noreferrer" className="relative w-full sm:w-1/3 shrink-0 overflow-hidden">
+            <article className="group flex flex-row overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md h-32 sm:h-48">
+                <a href={article.url} target="_blank" rel="noopener noreferrer" className="relative w-32 sm:w-1/3 shrink-0 overflow-hidden">
                     <img
                         src={article.image}
                         alt={article.title}
-                        className="h-48 w-full sm:h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute left-4 top-4 rounded-lg bg-primary/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                    <div className="hidden sm:block absolute left-4 top-4 rounded-lg bg-primary/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
                         {article.category}
                     </div>
                 </a>
 
-                <div className="flex flex-1 flex-col p-4 sm:p-5">
+                <div className="flex flex-1 flex-col p-3 sm:p-5">
                     <a href={article.url} target="_blank" rel="noopener noreferrer">
-                        <h3 className="mb-2 text-lg font-bold leading-snug text-primary group-hover:text-primary/80 line-clamp-2">
+                        <h3 className="mb-1 text-sm sm:text-lg font-bold leading-snug text-primary group-hover:text-primary/80 line-clamp-2 sm:line-clamp-2">
                             {article.title}
                         </h3>
                     </a>
-                    <p className="mb-4 line-clamp-2 text-sm text-muted">
+                    <p className="hidden sm:block mb-4 line-clamp-2 text-sm text-muted">
                         {article.description}
                     </p>
 
-                    <div className="mt-auto flex items-center justify-between pt-2">
-                        <span className="text-xs font-medium text-muted">{date}</span>
+                    <div className="mt-auto flex items-center justify-between pt-1">
+                        <span className="text-[10px] sm:text-xs font-medium text-muted">{date}</span>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => toggleBookmark(article as any)}
@@ -93,7 +93,7 @@ export const ArticleCard = ({ article, viewMode = 'grid' }: ArticleCardProps & {
                                     : 'text-muted hover:bg-slate-100 hover:text-primary'
                                     }`}
                             >
-                                <Bookmark size={16} fill={bookmarked ? "currentColor" : "none"} />
+                                <Bookmark size={14} className="sm:w-4 sm:h-4" fill={bookmarked ? "currentColor" : "none"} />
                             </button>
                             <button
                                 onClick={handleShare}
@@ -102,7 +102,7 @@ export const ArticleCard = ({ article, viewMode = 'grid' }: ArticleCardProps & {
                                     copied ? "bg-green-500 text-white" : "text-muted hover:bg-slate-100 hover:text-primary"
                                 )}
                             >
-                                {copied ? <Check size={16} /> : <Share2 size={16} />}
+                                {copied ? <Check size={14} className="sm:w-4 sm:h-4" /> : <Share2 size={14} className="sm:w-4 sm:h-4" />}
                             </button>
                         </div>
                     </div>

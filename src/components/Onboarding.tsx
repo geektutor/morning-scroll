@@ -51,7 +51,7 @@ export const PreferencesModal = ({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
-            <div className="flex h-full max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
+            <div className="flex h-full max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
 
                 {onClose && (
                     <div className="absolute right-6 top-6 z-10">
@@ -65,14 +65,14 @@ export const PreferencesModal = ({
                 )}
 
                 <div className="shrink-0 bg-primary px-8 py-8 text-white">
-                    <h1 className="text-3xl font-bold tracking-tight">Customize Your Feed</h1>
-                    <p className="mt-2 text-slate-200">
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Customize Your Feed</h1>
+                    <p className="mt-2 text-sm sm:text-base text-slate-200">
                         Personalize your reading experience by selecting your preferred layout and interests.
                     </p>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-8">
-                    <div className="flex flex-col gap-10">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+                    <div className="flex flex-col gap-8 sm:gap-10">
 
                         {/* View Preference Section */}
                         <section>
@@ -117,7 +117,7 @@ export const PreferencesModal = ({
                             <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">
                                 2. Select Topics
                             </h3>
-                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4">
                                 {ALL_CATEGORIES.filter(c => c.name !== 'Top Stories').map((cat) => {
                                     const isSelected = selected.includes(cat.name);
                                     return (
@@ -125,19 +125,19 @@ export const PreferencesModal = ({
                                             key={cat.name}
                                             onClick={() => toggleCategory(cat.name)}
                                             className={cn(
-                                                "group relative flex flex-col items-center gap-3 rounded-2xl border-2 p-4 transition-all",
+                                                "group relative flex flex-col items-center gap-3 rounded-2xl border-2 p-3 sm:p-4 transition-all",
                                                 isSelected
                                                     ? "border-primary bg-primary/5 text-primary shadow-sm"
                                                     : "border-slate-100 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                                             )}
                                         >
                                             <div className={cn(
-                                                "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
+                                                "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl transition-colors",
                                                 isSelected ? "bg-primary text-white" : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
                                             )}>
-                                                <cat.icon size={20} />
+                                                <cat.icon size={18} className="sm:w-5 sm:h-5" />
                                             </div>
-                                            <span className="text-sm font-semibold text-center">{cat.name}</span>
+                                            <span className="text-xs sm:text-sm font-semibold text-center">{cat.name}</span>
 
                                             {isSelected && (
                                                 <div className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white">
@@ -152,12 +152,12 @@ export const PreferencesModal = ({
                     </div>
                 </div>
 
-                <div className="shrink-0 border-t border-slate-100 bg-slate-50 p-6 flex justify-end">
+                <div className="shrink-0 border-t border-slate-100 bg-slate-50 p-4 sm:p-6 flex justify-end">
                     <button
                         onClick={handleSave}
                         disabled={selected.length === 0}
                         className={cn(
-                            "flex items-center gap-2 rounded-full px-8 py-3 text-lg font-bold transition-all",
+                            "flex items-center gap-2 rounded-full px-6 py-3 sm:px-8 text-base sm:text-lg font-bold transition-all",
                             selected.length > 0
                                 ? "bg-primary text-white hover:scale-105 hover:bg-primary/90 shadow-lg shadow-primary/25"
                                 : "bg-slate-200 text-slate-400 cursor-not-allowed"
