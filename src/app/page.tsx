@@ -91,7 +91,7 @@ export default function Home() {
   const gridArticles = articles.filter((a) => a !== heroArticle);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-[100dvh] flex-col bg-background">
       <PreferencesModal
         isOpen={isPreferencesOpen}
         onClose={() => setIsPreferencesOpen(false)}
@@ -124,7 +124,7 @@ export default function Home() {
         onSearch={setSearchQuery}
       />
 
-      <main className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main className="container mx-auto flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex gap-8">
           <Sidebar
             selectedCategory={activeCategory}
@@ -183,6 +183,15 @@ export default function Home() {
               className="font-semibold text-primary hover:text-accent transition-colors"
             >
               Geektutor
+            </a>
+            {' • '}
+            <a
+              href="https://useaccrue.com/pay/@geektutor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:text-accent transition-colors underline decoration-accent/30 decoration-2 underline-offset-4"
+            >
+              Donate
             </a>
           </p>
         </div>

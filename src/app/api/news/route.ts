@@ -56,9 +56,9 @@ const FEED_CONFIG = {
         "https://www.aljazeera.com/xml/rss/all.xml"
     ],
     "Sports": [
-        "https://www.bbc.com/sport/football/rss",
+        "https://feeds.bbci.co.uk/sport/rss.xml",
         "https://www.espn.com/espn/rss/news",
-        "https://www.skysports.com/rss/football",
+        "https://www.skysports.com/rss/11095",
         "https://www.completesports.com/feed/",
     ],
 };

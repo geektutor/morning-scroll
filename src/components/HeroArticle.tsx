@@ -47,7 +47,7 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
                 <h1 className="mb-4 max-w-3xl text-2xl font-bold leading-tight sm:text-3xl md:text-4xl lg:text-5xl">
                     {article.title}
                 </h1>
-                <p className="mb-8 max-w-2xl text-lg text-slate-300">
+                <p className="mb-8 max-w-2xl text-lg text-slate-300 line-clamp-4">
                     {article.description}
                 </p>
                 <div>
