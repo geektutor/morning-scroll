@@ -50,11 +50,6 @@ const FEED_CONFIG = {
         "https://www.theatlantic.com/feed/channel/culture/",
         "https://api.quantamagazine.org/feed/"
     ],
-    "Opinion": [
-        "https://www.nytimes.com/svc/vendor/nythelp/rss/resources/opinion.xml",
-        "https://www.theguardian.com/commentisfree/rss",
-        "https://www.aljazeera.com/xml/rss/all.xml"
-    ],
     "Sports": [
         "https://feeds.bbci.co.uk/sport/rss.xml",
         "https://www.espn.com/espn/rss/news",
