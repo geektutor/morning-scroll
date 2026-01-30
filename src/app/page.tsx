@@ -45,11 +45,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (activeCategory === 'Saved Articles') {
-      setArticles(bookmarks);
-      setLoading(false);
-      return;
-    }
+    if (activeCategory === 'Saved Articles') return;
 
     const fetchNews = async () => {
       setLoading(true);
@@ -78,7 +74,7 @@ export default function Home() {
     };
 
     fetchNews();
-  }, [activeCategory, bookmarks, searchQuery, userCategories]);
+  }, [activeCategory, searchQuery, userCategories]);
 
   // Update articles list when bookmarks change, but only if we are in 'Saved Articles' view
   useEffect(() => {
