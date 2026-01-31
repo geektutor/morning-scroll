@@ -8,10 +8,7 @@ const WAHA_API_KEY = '4679e98530e64476968b808d0e488497';
 const TARGET_GROUPS = [
     '2348187425208-1584899737@g.us',
     '120363037509164507@g.us',
-    // "120363351132395037@g.us"
 ];
-
-const sentHistory = new Set();
 
 function selectTopStories(articles) {
     const categories = {};
@@ -157,17 +154,21 @@ async function runNewsJob() {
 
     try {
         const articles = await fetchNews();
-        const newArticles = articles.filter(a => !sentHistory.has(a.id));
 
-        if (newArticles.length === 0) {
-            console.log('📭 No new articles.');
+        // Get only articles published in the last 6 hours to keep it fresh
+        const sixHoursAgo = new Date(now.getTime() - (6 * 60 * 60 * 1000));
+        const recentArticles = articles.filter(a => new Date(a.publishedAt) > sixHoursAgo);
+
+        if (recentArticles.length === 0) {
+            console.log('📭 No recent articles in the last 6 hours.');
             return;
         }
 
-        const topStories = selectTopStories(newArticles);
+        const topStories = selectTopStories(recentArticles);
 
-        for (const article of topStories) {
-            sentHistory.add(article.id);
+        if (topStories.length === 0) {
+            console.log('📭 Could not select top stories from recent articles.');
+            return;
         }
 
         console.log(`📊 Selected ${topStories.length} top stories across categories`);
@@ -182,17 +183,14 @@ async function runNewsJob() {
     }
 }
 
-cron.schedule('0 0,6,9,12,15,18,21 * * *', () => {
+// Every 3 hours schedule: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm
+cron.schedule('0 0,3,6,9,12,15,18,21 * * *', () => {
+    console.log(`🕐 CRON TRIGGERED at ${new Date().toLocaleTimeString()}`);
     runNewsJob();
 });
 
-// cron.schedule('01 11 * * *', () => {
-//     runNewsJob();
-// });
-
 console.log('🚀 Service started.');
 console.log(`📡 Targeting ${TARGET_GROUPS.length} groups.`);
-console.log('⏱️  Will post top stories at 12am, 6am, 9am, 12pm, 3pm, 6pm, 9pm daily');
-console.log('⏱️  Plus 10:46am for testing');
+console.log('⏱️  Will post top stories every 3 hours: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
 
 runNewsJob();
