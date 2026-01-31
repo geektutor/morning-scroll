@@ -2,9 +2,9 @@ import cron from 'node-cron';
 import axios from 'axios';
 import { fetchNews } from '../news/index.js';
 
-const WAHA_URL = 'http://localhost:3000';
+const WAHA_URL = 'http://localhost:3001';
 const CHANNEL_ID = '120363409113673268@newsletter';
-const WAHA_API_KEY = 'ceb57765ed654e6894e329a00f8edb77'; // Authenticates you
+const WAHA_API_KEY = '4679e98530e64476968b808d0e488497'; // Authenticates you
 
 // Memory to store IDs of articles we have already sent
 const sentHistory = new Set();
