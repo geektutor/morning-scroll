@@ -16,11 +16,10 @@ export const config = {
             "https://tribuneonlineng.com/feed/"
         ],
         "World News": [
-            "http://rss.cnn.com/rss/edition.rss",
-            "http://feeds.bbci.co.uk/news/world/rss.xml",
+            "https://feeds.bbci.co.uk/news/world/rss.xml",
             "https://www.aljazeera.com/xml/rss/all.xml",
             "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
-            "https://moxie.foxnews.com/google-publisher/world.xml", // Fox News World
+            "https://moxie.foxnews.com/google-publisher/world.xml",
             "https://www.japantimes.co.jp/feed/",
             "https://www.france24.com/en/rss",
             "https://feeds.washingtonpost.com/rss/world"
@@ -34,8 +33,8 @@ export const config = {
         ],
         "Sports": [
             "https://www.skysports.com/rss/12040",
-            "https://www.espn.com/espn/rss/news", // Reliable Global Sports
-            "https://api.foxsports.com/v2/content/optimized-rss?partnerKey=MB0Wehpmuj2lUhuRhQaafhBjAJqaPU244mlTDK1i&size=30&tags=fs/soccer,fs/nfl,fs/nba", // Fox Sports Mixed
+            "https://www.espn.com/espn/rss/news",
+            "https://api.foxsports.com/v2/content/optimized-rss?partnerKey=MB0Wehpmuj2lUhuRhQaafhBjAJqaPU244mlTDK1i&size=30&tags=fs/soccer,fs/nfl,fs/nba",
             "https://www.cbssports.com/rss/headlines/"
         ],
         "Finance": [
@@ -47,7 +46,7 @@ export const config = {
             "https://variety.com/feed/",
             "https://www.hollywoodreporter.com/feed/",
             "https://www.tmz.com/rss.xml",
-            "https://www.lindaikejisblog.com/feed" // Nigeria Entertainment
+            "https://www.lindaikejisblog.com/feed"
         ]
     }
 }
