@@ -7,7 +7,7 @@ const WAHA_API_KEY = '4679e98530e64476968b808d0e488497';
 
 const TARGET_GROUPS = [
     '2348187425208-1584899737@g.us',
-    '120363037509164507@g.us',
+    // '120363037509164507@g.us',
 ];
 
 function getControversialKeywords() {
