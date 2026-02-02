@@ -10,38 +10,80 @@ const TARGET_GROUPS = [
     '120363037509164507@g.us',
 ];
 
+function getControversialKeywords() {
+    return {
+        us: ['trump', 'biden', 'democrat', 'republican', 'election', 'impeachment', 'border', 'immigration',
+            'abortion', 'gun', 'climate', 'woke', 'supreme court', 'gop', 'kamala', 'putin', 'ukraine',
+            'china', 'iran', 'middle east', 'israel', 'palestine', 'migrant', 'sanction', 'tariff'],
+        nigeria: ['tinubu', 'atiku', 'obi', 'apc', 'pdp', 'labour party', 'inflation', 'fuel subsidy',
+            'naira', 'cbn', 'efcc', 'corruption', 'insecurity', 'bandits', 'bokoharam', 'ipob',
+            'secession', 'herdsmen', 'religious', 'lgbt', 'same-sex', 'budget', 'senate', 'asuu',
+            'nlc', 'minimum wage', 'petrol', 'electricity'],
+        general: ['scandal', 'protest', 'riot', 'strike', 'crisis', 'controversy', 'outrage', 'accusation',
+            'investigation', 'lawsuit', 'arrest', 'resignation', 'impeachment', 'leak', 'whistleblower']
+    };
+}
+
+function isControversialArticle(article) {
+    const keywords = getControversialKeywords();
+    const title = article.title.toLowerCase();
+    const desc = (article.description || '').toLowerCase();
+    const content = title + ' ' + desc;
+
+    if (keywords.general.some(keyword => content.includes(keyword))) {
+        return true;
+    }
+
+    if (content.includes('nigeria') || content.includes('nigerian')) {
+        return keywords.nigeria.some(keyword => content.includes(keyword));
+    }
+
+    if (content.includes('u.s.') || content.includes('united states') || content.includes('american')) {
+        return keywords.us.some(keyword => content.includes(keyword));
+    }
+
+    return false;
+}
+
 function selectTopStories(articles) {
     const categories = {};
 
     articles.forEach(article => {
         if (!categories[article.category]) {
-            categories[article.category] = [];
+            categories[article.category] = { controversial: [], regular: [] };
         }
-        categories[article.category].push(article);
+
+        if (isControversialArticle(article)) {
+            categories[article.category].controversial.push(article);
+        } else {
+            categories[article.category].regular.push(article);
+        }
     });
 
     const selectedArticles = [];
     const categoryOrder = ["Nigeria", "World News", "Technology", "Sports", "Finance", "Entertainment"];
 
     categoryOrder.forEach(category => {
-        if (categories[category] && categories[category].length > 0) {
-            const categoryArticles = categories[category];
-            const sortedByDate = categoryArticles.sort((a, b) =>
-                new Date(b.publishedAt) - new Date(a.publishedAt)
-            );
-            selectedArticles.push(sortedByDate[0]);
+        if (categories[category]) {
+            const sortedControversial = categories[category].controversial
+                .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
-            if (categoryArticles.length > 1) {
-                const secondArticle = sortedByDate.find(article =>
-                    article.source.toLowerCase().includes('vanguard') ||
-                    article.source.toLowerCase().includes('cnn') ||
-                    article.source.toLowerCase().includes('bbc') ||
-                    article.source.toLowerCase().includes('aljazeera') ||
-                    article.source.toLowerCase().includes('nytimes')
-                ) || sortedByDate[1];
+            const sortedRegular = categories[category].regular
+                .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
-                if (secondArticle && selectedArticles.length < 8) {
-                    selectedArticles.push(secondArticle);
+            if (sortedControversial.length > 0) {
+                selectedArticles.push(sortedControversial[0]);
+
+                if (selectedArticles.length < 8 && sortedControversial.length > 1) {
+                    selectedArticles.push(sortedControversial[1]);
+                } else if (selectedArticles.length < 8 && sortedRegular.length > 0) {
+                    selectedArticles.push(sortedRegular[0]);
+                }
+            } else if (sortedRegular.length > 0) {
+                selectedArticles.push(sortedRegular[0]);
+
+                if (selectedArticles.length < 8 && sortedRegular.length > 1) {
+                    selectedArticles.push(sortedRegular[1]);
                 }
             }
         }
@@ -53,35 +95,57 @@ function selectTopStories(articles) {
 function formatArticle(article, index) {
     const sourceEmoji = getSourceEmoji(article.source);
     const categoryEmoji = getCategoryEmoji(article.category);
+    const isControversial = isControversialArticle(article);
+    const controversialTag = isControversial ? ' 🔥' : '';
 
-    let formatted = `${index}. ${categoryEmoji} *${article.title}*\n`;
+    let formatted = `${index}. ${categoryEmoji} *${article.title}*${controversialTag}\n`;
 
     if (article.source) {
         formatted += `   ${sourceEmoji} _${article.source}_\n`;
     }
 
-    if (article.description && article.description.length > 30) {
-        const cleanDescription = article.description.replace(/<[^>]*>/g, '').trim();
-        formatted += `   📝 ${cleanDescription.substring(0, 120)}${cleanDescription.length > 120 ? '...' : ''}\n`;
+    if (isControversial) {
+        formatted += `   ⚠️ _Hot Topic_\n`;
     }
 
+    if (article.description && article.description.length > 30) {
+        const cleanDescription = article.description.replace(/<[^>]*>/g, '').trim();
+        formatted += `   📝 ${cleanDescription.substring(0, 100)}${cleanDescription.length > 100 ? '...' : ''}\n`;
+    }
+
+    const date = new Date(article.publishedAt);
+    const now = new Date();
+    const hoursDiff = Math.floor((now - date) / (1000 * 60 * 60));
+
+    let timeText;
+    if (hoursDiff < 1) {
+        timeText = 'Just now';
+    } else if (hoursDiff < 24) {
+        timeText = `${hoursDiff}h ago`;
+    } else {
+        timeText = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    formatted += `   🕐 ${timeText}\n`;
     formatted += `   🔗 ${article.url}\n\n`;
 
     return formatted;
 }
 
 function getSourceEmoji(source) {
-    const sourceLower = source.toLowerCase();
+    const sourceLower = (source || '').toLowerCase();
     if (sourceLower.includes('vanguard')) return '🇳🇬';
     if (sourceLower.includes('punch')) return '👊';
-    if (sourceLower.includes('cnn')) return '🌍';
+    if (sourceLower.includes('cnn')) return '🇺🇸';
     if (sourceLower.includes('bbc')) return '🇬🇧';
     if (sourceLower.includes('aljazeera')) return '🌐';
     if (sourceLower.includes('nytimes')) return '🗽';
-    if (sourceLower.includes('tech') || sourceLower.includes('verge')) return '💻';
-    if (sourceLower.includes('sports') || sourceLower.includes('espn')) return '⚽';
-    if (sourceLower.includes('finance') || sourceLower.includes('bloomberg')) return '💰';
-    if (sourceLower.includes('entertainment') || sourceLower.includes('hollywood')) return '🎬';
+    if (sourceLower.includes('fox')) return '🦊';
+    if (sourceLower.includes('politico')) return '🏛️';
+    if (sourceLower.includes('bloomberg')) return '💹';
+    if (sourceLower.includes('techcrunch')) return '🚀';
+    if (sourceLower.includes('espn')) return '⚽';
+    if (sourceLower.includes('hollywood')) return '🎬';
     return '📰';
 }
 
@@ -97,35 +161,38 @@ function getCategoryEmoji(category) {
     }
 }
 
-async function sendNewsDigest(groupId, timeString, articles) {
-    let message = `📰 *TOP STORIES AS AT ${timeString}*\n`;
-    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `*Comprehensive News Digest*\n`;
-    message += `Curated from 30+ major outlets\n\n`;
+async function sendNewsDigest(groupId, timeString, articles, period) {
+    const periodText = period === 'morning' ? 'MORNING' : 'EVENING';
+    const greeting = period === 'morning' ? '🌅 Good Morning!' : '🌇 Good Evening!';
+    const controversialCount = articles.filter(isControversialArticle).length;
 
-    message += `*📊 TODAY'S TOP PICKS:*\n\n`;
+    let message = `${greeting}\n\n`;
+    message += `📰 *${periodText} NEWS HIGHLIGHTS*\n`;
+    message += `⏰ ${timeString} • ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}\n\n`;
+
+    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    if (controversialCount > 0) {
+        message += `🔥 *Today's Top Stories* (${controversialCount} hot topics)\n\n`;
+    } else {
+        message += `📊 *Today's Top Stories*\n\n`;
+    }
 
     articles.forEach((article, index) => {
         message += formatArticle(article, index + 1);
     });
 
     message += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `🌟 *STAY AHEAD OF THE CURVE!* 🌟\n\n`;
-    message += `📱 *JOIN OUR EXCLUSIVE CHANNEL:*\n`;
-    message += `👉 https://whatsapp.com/channel/0029Vb7lWMxJpe8p7p58KM2l\n`;
-    message += `_Get real-time updates before anyone else!_\n\n`;
-    message += `🌐 *DIVE DEEPER ON OUR SITE:*\n`;
-    message += `👉 https://morningscroll.xyz/\n`;
-    message += `_Extended coverage & analysis_\n\n`;
-    message += `💎 *WHY MORNING SCROLL?*\n`;
-    message += `✓ 24/7 breaking news alerts\n`;
-    message += `✓ Multi-source verification\n`;
-    message += `✓ Balanced perspectives\n`;
-    message += `✓ Zero clickbait, pure facts\n`;
-    message += `✓ All categories covered\n\n`;
-    message += `🔔 *Turn on notifications!*\n`;
-    message += `Share this update → Help others stay informed 📲\n\n`;
-    message += `#MorningScroll #NewsAlert #StayInformed #${timeString.replace(/[: ]/g, '')}`;
+
+    if (controversialCount > 0) {
+        message += `⚠️ *Hot Topics Today:* ${controversialCount} stories generating significant discussion\n`;
+        message += `Get balanced perspectives from multiple sources.\n\n`;
+    }
+
+    message += `📱 *Get More News:*\n`;
+    message += `👉 https://morningscroll.xyz/\n\n`;
+    message += `🔔 *Stay informed. Think critically.*\n`;
+    message += `#NewsHighlights #${period === 'morning' ? 'MorningBrief' : 'EveningUpdate'} #StayInformed`;
 
     const axiosConfig = {
         headers: {
@@ -140,41 +207,50 @@ async function sendNewsDigest(groupId, timeString, articles) {
             text: message,
             session: "default"
         }, axiosConfig);
-        console.log(`✅ Sent ${articles.length} top stories to ${groupId}`);
+        console.log(`✅ Sent ${period} highlights to ${groupId}`);
     } catch (e) {
         console.error(`❌ Failed to send to ${groupId}:`, e.response ? e.response.status : e.message);
     }
 }
 
-async function runNewsJob() {
+async function runNewsJob(period) {
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-    console.log(`\n⏰ [${now.toLocaleTimeString()}] Fetching top stories...`);
+    console.log(`\n⏰ [${now.toLocaleTimeString()}] Fetching ${period} news highlights...`);
 
     try {
         const articles = await fetchNews();
 
-        // Get only articles published in the last 6 hours to keep it fresh
-        const sixHoursAgo = new Date(now.getTime() - (6 * 60 * 60 * 1000));
-        const recentArticles = articles.filter(a => new Date(a.publishedAt) > sixHoursAgo);
+        const cutoffHours = period === 'morning' ? 12 : 6;
+        const cutoffTime = new Date(now.getTime() - (cutoffHours * 60 * 60 * 1000));
+
+        const recentArticles = articles.filter(a => {
+            try {
+                const articleDate = new Date(a.publishedAt);
+                return articleDate > cutoffTime && articleDate.getFullYear() > 2000;
+            } catch {
+                return false;
+            }
+        });
 
         if (recentArticles.length === 0) {
-            console.log('📭 No recent articles in the last 6 hours.');
+            console.log(`📭 No recent articles in the last ${cutoffHours} hours.`);
             return;
         }
 
         const topStories = selectTopStories(recentArticles);
 
         if (topStories.length === 0) {
-            console.log('📭 Could not select top stories from recent articles.');
+            console.log('📭 Could not select top stories.');
             return;
         }
 
-        console.log(`📊 Selected ${topStories.length} top stories across categories`);
+        const controversialCount = topStories.filter(isControversialArticle).length;
+        console.log(`📊 Selected ${topStories.length} stories (${controversialCount} controversial)`);
 
         for (const groupId of TARGET_GROUPS) {
-            await sendNewsDigest(groupId, timeString, topStories);
+            await sendNewsDigest(groupId, timeString, topStories, period);
             await new Promise(r => setTimeout(r, 2000));
         }
 
@@ -183,14 +259,36 @@ async function runNewsJob() {
     }
 }
 
-// Every 3 hours schedule: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm
-cron.schedule('0 0,3,6,9,12,15,18,21 * * *', () => {
-    console.log(`🕐 CRON TRIGGERED at ${new Date().toLocaleTimeString()}`);
-    runNewsJob();
+cron.schedule('0 6 * * *', () => {
+    const nigeriaTime = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos', hour12: false });
+    console.log(`🌅 MORNING CRON TRIGGERED at ${nigeriaTime}`);
+    runNewsJob('morning');
+}, {
+    scheduled: true,
+    timezone: "Africa/Lagos"
 });
 
-console.log('🚀 Service started.');
-console.log(`📡 Targeting ${TARGET_GROUPS.length} groups.`);
-console.log('⏱️  Will post top stories every 3 hours: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
+cron.schedule('0 18 * * *', () => {
+    const nigeriaTime = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos', hour12: false });
+    console.log(`🌇 EVENING CRON TRIGGERED at ${nigeriaTime}`);
+    runNewsJob('evening');
+}, {
+    scheduled: true,
+    timezone: "Africa/Lagos"
+});
 
-runNewsJob();
+console.log('🚀 News Highlights Service started.');
+console.log(`📡 Targeting ${TARGET_GROUPS.length} groups.`);
+console.log('⏱️  Will post news highlights at 6 AM and 6 PM Nigeria Time');
+
+setTimeout(() => {
+    const now = new Date();
+    const nigeriaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' }));
+    const hours = nigeriaTime.getHours();
+
+    if (hours === 6 || hours === 18) {
+        const period = hours === 6 ? 'morning' : 'evening';
+        console.log(`⏰ Running initial ${period} job...`);
+        runNewsJob(period);
+    }
+}, 5000);
